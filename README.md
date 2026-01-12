@@ -646,7 +646,39 @@ p <- plot_richness(ps,
 
 print(p)
 ```
-![](Alpha_Diversity_PLot.png)<!-- -->
+![](Alpha_Diversity_Plot.png)<!-- -->
+
+### PCoA
+
+```{r}
+metadata <- as.data.frame(as(sample_data(ps_bact), "data.frame"))
+
+n_total <- nrow(metadata)
+conditions <- rep("no inoculation", n_total)
+
+conditions[1:40] <- "direct"
+
+metadata$Condition_Aled <- factor(conditions, levels = c("direct", "no inoculation"))
+
+sample_data(ps_bact) <- sample_data(metadata)
+
+print("Vérification des groupes :")
+print(table(sample_data(ps_bact)$Condition_Aled)) 
+
+pcoa_res <- ordinate(ps_bact, method = "PCoA", distance = "bray")
+
+p_final <- plot_ordination(ps_bact, pcoa_res, color = "Condition_Aled") + 
+  geom_jitter(size = 3, alpha = 0.7, width = 0.08, height = 0.08) + 
+  stat_ellipse(type = "t", linetype = 2) + 
+  theme_bw() +
+  scale_color_manual(values = c("direct" = "blue", "no inoculation" = "red")) +
+  labs(title = "PCoA : 80 Échantillons (40 Direct / 40 No Inoculation)",
+       color = "Condition")
+
+print(p_final)
+```
+
+![](Alpha_Diversity_Plot.png)<!-- -->
 
 ### Barplot de composition taxonomique 
 
