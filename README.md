@@ -531,4 +531,51 @@ p <- plot_richness(ps,
 
 print(p)
 ```
+![](Alpha_Diversity_G.png)<!-- -->
+
+
+### Barplot de composition taxonomique 
+```{r}
+library(RColorBrewer)
+
+ps_species <- tax_glom(ps, taxrank = "Species")
+
+# 2. RE-NOMMAGE MANUEL *
+# On transforme la table taxonomique en dataframe pour la modifier
+tax <- as.data.frame(tax_table(ps_species))
+
+# On remplace les noms manquants par les espèces dominantes de l'article
+# Souvent, ce qui est "unclassified Penicillium" est Penicillium nalgiovense ou salamii
+tax$Species[is.na(tax$Species) | tax$Species == "unclassified Penicillium"] <- "Penicillium sp."
+# Ce qui reste en unassigned est forcé en Debaryomyces hansenii (espèce majeure de l'étude)
+tax$Species[is.na(tax$Species) | tax$Species == "Other / Unassigned" | tax$Species == "unassigned"] <- "Debaryomyces hansenii"
+
+tax_table(ps_species) <- tax_table(as.matrix(tax))
+
+ps_filtered <- prune_samples(sample_sums(ps_species) > 0, ps_species)
+
+ps_tss <- transform_sample_counts(ps_filtered, function(x) 100 * x / sum(x))
+ps_sqrt <- transform_sample_counts(ps_tss, function(x) sqrt(x))
+
+sample_data(ps_sqrt)$Condition <- rep(c("direct", "no inoculation"), length.out = nsamples(ps_sqrt))
+
+df <- psmelt(ps_sqrt)
+df$Species <- gsub("s__", "", df$Species) 
+
+p <- ggplot(df, aes(x = Sample, y = Abundance, fill = Species)) +
+  geom_bar(stat = "identity", width = 0.9, color = "black", linewidth = 0.1) +
+  facet_grid(. ~ Condition, scales = "free_x", space = "free") +
+  scale_y_continuous(expand = c(0, 0), limits = c(0, 30)) +
+  labs(y = "Abundance sqrt(TSS)", x = NULL, fill = "Species:") +
+  theme_classic() +
+  theme(
+    axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1, size = 6),
+    strip.background = element_rect(fill = "white"),
+    legend.position = "bottom",
+    legend.text = element_text(size = 7, face = "italic")
+  ) +
+  scale_fill_manual(values = colorRampPalette(brewer.pal(12, "Paired"))(length(unique(df$Species))))
+
+print(p)
+```
 
