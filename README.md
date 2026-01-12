@@ -93,4 +93,63 @@ sample.names <- sapply(strsplit(basename(fnFs), "_"), `[`, 1)
 ```{r}
 plotQualityProfile(fnFs[1:2])
 ```
-![](unnamed-chunk-4-1.png)<!-- -->
+![](profil_qualite.png)<!-- -->
+
+```{r}
+plotQualityProfile(fnRs[1:2])
+```
+![](profil_qualite2.png)<!-- -->
+
+```{r}
+filtFs <- file.path(path, "filtered", # Crée un chemin vers un sous-dosier "filtered" à l'intérieur du dossier 'path"
+                    paste0(sample.names, "_F_filt.fastq.gz"))# Crée le nom du fichier filtré pour chaque échantillon
+
+filtRs <- file.path(path, "filtered", paste0(sample.names, "_R_filt.fastq.gz"))
+names(filtFs) <- sample.names
+names(filtRs) <- sample.names # Attribution de ces noms aux fichiers
+```
+
+```{r}
+out <- filterAndTrim(fnFs, filtFs, fnRs, filtRs, truncLen=c(290,270), # Tronque les lectures Forward à 240 bases et Reverse à 160 bases
+              maxN=0, # Elimine toutes lecture contenant une base inconnue
+              maxEE=c(2,2), # Maximum d'erreurs par lecture
+              truncQ=2, # Tronque la lecture dès que son score de qualité est inférieur à 2
+              rm.phix=TRUE, # Supprime les lectures provenant du génome PhiX
+              compress=TRUE, multithread=FALSE) 
+head(out)
+```
+
+```{r}
+                    reads.in reads.out
+SRR15634651_1.fastq    62839     37465
+SRR15634652_1.fastq    44399     24703
+SRR15634653_1.fastq    44376     19114
+SRR15634654_1.fastq   111565     29045
+SRR15634655_1.fastq    70934     45311
+SRR15634656_1.fastq    87940     44730
+```
+
+```{r}
+errF <- learnErrors(filtFs, multithread=FALSE)# Modèle statistique des erreurs à partir des lectures filtrées Forward
+```
+
+```{r}
+100568230 total bases in 346787 reads from 13 samples will be used for learning the error rates.
+```
+
+```{r}
+errR <- learnErrors(filtRs, multithread=FALSE)# Modèle statistique des erreurs à partir des lectures filtrées Reverse
+```
+
+```{r}
+103531500 total bases in 383450 reads from 14 samples will be used for learning the error rates.
+```
+
+```{r}
+plotErrors(errF, nominalQ=TRUE)
+```
+![](profil_qualite3.png)<!-- -->
+
+```{r}
+dadaFs <- dada(filtFs, err=errF, multithread=FALSE)
+```
