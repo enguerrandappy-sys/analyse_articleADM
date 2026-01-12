@@ -98,7 +98,7 @@ plotQualityProfile(fnFs[1:2])
 ```{r}
 plotQualityProfile(fnRs[1:2])
 ```
-![](profil_qualite2.png)<!-- -->
+
 
 ```{r}
 filtFs <- file.path(path, "filtered", # Crée un chemin vers un sous-dosier "filtered" à l'intérieur du dossier 'path"
