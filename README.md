@@ -646,7 +646,7 @@ p <- plot_richness(ps,
 
 print(p)
 ```
-
+![](Alpha_Diversity_PLot.png)<!-- -->
 
 ### Barplot de composition taxonomique 
 
