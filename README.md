@@ -531,7 +531,7 @@ p <- plot_richness(ps,
 
 print(p)
 ```
-![](Alpha_Diversity_G.png)<!-- -->
+![](Alpha_Diversity_Groups2.png)<!-- -->
 
 
 ### Barplot de composition taxonomique 
@@ -578,4 +578,118 @@ p <- ggplot(df, aes(x = Sample, y = Abundance, fill = Species)) +
 
 print(p)
 ```
+![](Figure2B_Final_Coton_Style.png)<!-- -->
 
+Communautés au début et à la fin de la conservation des échantillons de viande et de boyau. S : dates de début des échantillons de viande (S1 à S10) ; F : dates de fin des échantillons de viande (F1 à F10) ; 1 à 10 : dates de début des échantillons de boyau de surface ; 11 à 20 : dates de fin des échantillons de boyau de surface ; M : viande ; S : boyau de saucisse ; R : répétition.
+
+La figure présente la composition des communautés fongiques des différents échantillons, exprimée en abondance relative. Globalement, les communautés sont largement dominées par Debaryomyces hansenii, qui constitue le taxon majoritaire dans la majorité des conditions analysées, indiquant ainsi son rôle central dans cet écosystème.
+
+Les échantillons sans inoculation se caractérisent par des communautés peu diversifiées, avec une forte dominance de D. hansenii et la présence limitée de taxons minoritaires. 
+
+À l’inverse, l’inoculation directe entraîne une modification notable de la structure des communautés fongiques, marquée par une augmentation de la diversité et de l’équitabilité. Plusieurs espèces, notamment des genres Candida, Penicillium, Aspergillus, Wickerhamomyces et Yamadazyma, présentent des abondances plus élevées dans les échantillons inoculés.
+
+Malgré ces changements, D. hansenii reste dominant dans l’ensemble des traitements, suggérant une forte capacité d’adaptation et de persistance. Les profils observés sont globalement cohérents entre réplicats, bien que des variations dans les taxons minoritaires traduisent une variabilité biologique normale. 
+
+Ces résultats indiquent que l’inoculation directe favorise une structuration plus complexe des communautés fongiques sans remise en cause de l’espèce dominante.
+
+A noter que dans le code utilisé, une assignation manuelle jusqu'à l'espèce a été performée vis à vis des Debaryomyces non identifiées, car en majorité repréentées par D. hansenii
+
+## Partie bactérienne 
+
+### Assignation taxonomique 
+
+```{r}
+taxa2 <- assignTaxonomy(seqtab.nochim, "~/dossier_1/silva_nr_v132_train_set.fa.gz", multithread=FALSE)
+```
+
+```{r}
+rownames(taxa2) <- NULL
+head(taxa2)
+```
+
+```{r}
+Kingdom     Phylum            Class       Order          Family         Genus       
+[1,] "Eukaryota" NA                NA          NA             NA             NA          
+[2,] "Eukaryota" NA                NA          NA             NA             NA          
+[3,] "Eukaryota" NA                NA          NA             NA             NA          
+[4,] "Eukaryota" NA                NA          NA             NA             NA          
+[5,] "Eukaryota" NA                NA          NA             NA             NA          
+[6,] "Eukaryota" "Opisthokonta_ph" "Aphelidea" "Aphelidea_or" "Aphelidea_fa" "Aphelidium"
+```
+### Création de l'objet phyloseq 
+
+```{r}
+metadata <- read.csv("SraRunTable.csv", row.names = 1)
+
+ps <- phyloseq(
+  otu_table(seqtab.nochim, taxa_are_rows = FALSE),
+  tax_table(taxa2),
+  sample_data(metadata)
+)
+```
+
+### Barplot de composition taxonomique 
+
+```{r}
+ps_rel <- transform_sample_counts(ps, function(x) x / sum(x))
+
+ps_genus <- tax_glom(ps_rel, taxrank = "Genus")
+
+df_genus <- psmelt(ps_genus)
+
+df_genus$Taxon <- as.character(df_genus$Genus)
+df_genus$Taxon[df_genus$Abundance < 0.05] <- "Others"
+
+unique_samples <- unique(df_genus$Sample)
+
+mapping_table <- data.frame(
+  Sample = unique_samples,
+  Condition_New = c(rep("direct", 40), rep("no inoculation", 40)),
+  stringsAsFactors = FALSE
+)
+
+df_genus <- df_genus %>%
+  left_join(mapping_table, by = "Sample") %>%
+  mutate(
+    Condition = factor(Condition_New, levels = c("direct", "no inoculation")),
+    Sample = factor(Sample, levels = unique_samples)
+  )
+```
+  
+
+```{r}
+library(scales)
+library(dplyr)
+
+n_taxa <- length(unique(df_genus$Taxon))
+cols <- colorRampPalette(brewer.pal(12, "Set3"))(n_taxa)
+
+
+p <- ggplot(df_genus, aes(x = Sample, y = Abundance, fill = Taxon)) +
+  geom_col(color = "white", width = 0.8) +
+  scale_y_continuous(
+    labels = percent_format(accuracy = 1),
+    limits = c(0, 1.001), # Un peu plus que 1 pour éviter de couper le trait du haut
+    expand = c(0, 0)
+  ) +
+  scale_fill_manual(values = cols) +
+
+  facet_grid(~Condition, scales = "free_x", space = "free_x") + 
+  labs(
+    x = "",
+    y = "Relative abundance (%)",
+    fill = "Bacterial taxa"
+  ) +
+  theme_bw(base_size = 14) +
+  theme(
+    axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1, size = 6),
+    axis.title.y = element_text(face = "bold"),
+    strip.background = element_rect(fill = "white"),
+    strip.text = element_text(face = "bold", size = 12),
+    panel.spacing = unit(0.2, "lines"), # Espace entre les deux blocs
+    legend.position = "right"
+  )
+
+print(p)
+```
+![](Figure2B_Final_Coton_Style.png)<!-- -->
