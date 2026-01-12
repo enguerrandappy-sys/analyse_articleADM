@@ -93,4 +93,4 @@ sample.names <- sapply(strsplit(basename(fnFs), "_"), `[`, 1)
 ```{r}
 plotQualityProfile(fnFs[1:2])
 ```
-
+![](unnamed-chunk-4-1.png)<!-- -->
