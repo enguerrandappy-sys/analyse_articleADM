@@ -508,6 +508,8 @@ print(table(sample_data(ps)$SampleGroup))
             40             40 
 ```
 
+### Alpha diversité 
+
 ```{r}
 p <- plot_richness(ps, 
                    x = "SampleGroup", 
@@ -628,6 +630,24 @@ ps <- phyloseq(
 )
 ```
 
+### Alpha diversité 
+```{r}
+samdf <- data.frame(SampleID = sample_names(ps), row.names = sample_names(ps))
+samdf$SampleGroup <- ifelse(seq_len(nrow(samdf)) <= 40, "Direct", "No Inoculation")
+sample_data(ps) <- sample_data(samdf)
+
+p <- plot_richness(ps, 
+                   x = "SampleGroup", 
+                   measures = c("Shannon", "Simpson"), 
+                   color = "SampleGroup") +
+  geom_boxplot(alpha = 0.2, outlier.shape = NA) +
+  geom_point(alpha = 0.5) + # C'est ici que l'erreur se produisait
+  theme_bw()
+
+print(p)
+```
+
+
 ### Barplot de composition taxonomique 
 
 ```{r}
@@ -655,7 +675,6 @@ df_genus <- df_genus %>%
     Sample = factor(Sample, levels = unique_samples)
   )
 ```
-  
 
 ```{r}
 library(scales)
@@ -692,4 +711,19 @@ p <- ggplot(df_genus, aes(x = Sample, y = Abundance, fill = Taxon)) +
 
 print(p)
 ```
-![](Figure2B_Final_Coton_Style.png)<!-- -->
+![](Barplot_Bacteries_Corrected.png)<!-- -->
+
+Cette figure présente l’abondance relative des communautés bactériennes.
+
+Les résultats montrent une différence nette de structure des communautés microbiennes entre ces groupes. 
+
+En ce qui concerne la structure des communautés bactériennes, les staphylocoques dominaient largement dans l’ensemble des saucissons. 
+
+Toutefois, un profil distinct a été observé pour les saucissons naturellement couvertes de moisissures, celles-ci étant principalement colonisées par Staphylococcus equorum au niveau du boyau, tandis que d’autres espèces de Staphylococcus, dont Staphylococcus saprophyticus, étaient majoritairement présentes dans la viande, conjointement avec Lactobacillus sakei parmi les bactéries lactiques. 
+
+De nombreuses espèces bactériennes halotolérantes ont également été identifiées à des abondances variables dans ces échantillons, notamment des genres Halomonas, Tetragenococcus et Celerinatantimonas. 
+
+En contraste avec ces résultats, Staphylococcus sp., S. saprophyticus et L. sakei constituaient les trois espèces les plus abondantes dans les saucisses inoculées volontairement, bien que L. sakei et S. saprophyticus soient clairement associées aux échantillons de viande. 
+
+Globalement, les communautés bactériennes de ces échantillons étaient moins diversifiées que celles des saucisses fermentées naturellement.
+
