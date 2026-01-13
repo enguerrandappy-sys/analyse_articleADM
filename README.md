@@ -3,6 +3,8 @@
 
 #### Etude sur laquelle est basée cette analyse : Coton M, Deniel F, Mounier J, Joubrel R, Robieu E, Pawtowski A, Jeuge S, Taminiau B, Daube G, Coton E, Frémaux B. Microbial Ecology of French Dry Fermented Sausages and Mycotoxin Risk Evaluation During Storage. Front Microbiol. 2021 Nov 4;12:737140. doi: 10.3389/fmicb.2021.737140. PMID: 34803951; PMCID: PMC8601720.
 
+## Introduction 
+
 Le saucisson sec français est un écosystème complexe où interagissent des bactéries lactiques, des staphylocoques à coagulase négative, des levures et des moisissures. Si cette microflore est essentielle au développement des qualités organoleptiques (goût, texture, odeur), elle joue aussi un rôle crucial de barrière protectrice.
 
 Le problème central de l'article est l'évaluation de l'équilibre de l'écosystème microbien face au risque de contamination fongique toxique.
@@ -21,9 +23,21 @@ L’analyse de la diversité alpha permet de mesurer la richesse et l’équitab
 
 ### 2. Comparaison de la Diversité Bêta
 
-La diversité bêta est essentielle pour comparer la structure des communautés entre différents groupes d'échantillons. Par le biais de méthodes d'ordination comme le PCoA (Principal Coordinates Analysis) ou le NMDS basés sur les distances de Bray-Curtis ou Unifrac, Phyloseq permet de visualiser si les échantillons se regroupent en fonction de leur profil de sécurité sanitaire. Cette étape permet de distinguer clairement la signature microbienne des saucissons "sains" de ceux présentant un risque de contamination par les mycotoxines, mettant ainsi en évidence l'impact des variations de la flore sur la stabilité du produit.
+La diversité bêta est essentielle pour comparer la structure des communautés entre différents groupes d'échantillons. Par le biais de méthodes d'ordination comme le PCoA (Principal Coordinates Analysis) ou le NMDS basés sur les distances de Bray-Curtis ou Unifrac, Phyloseq permet de visualiser si les échantillons se regroupent en fonction de leur profil de sécurité sanitaire. 
 
+Cette étape permet de distinguer clairement la signature microbienne des saucissons "sains" de ceux présentant un risque de contamination par les mycotoxines, mettant ainsi en évidence l'impact des variations de la flore sur la stabilité du produit.
 
+## Matériels et Méthodes
+
+### Traitement des données 
+
+Les données et métadonnées des échantillons ont été récupérées via numéro d'accesion sur SRA Run Selector et ENA EBI.
+
+Les séquences ont ensuite été traitées via le pipeline dada2, permettant le filtrage des données et la suppresion des chimères, ainsi que la correction des erreurs. Les figures de score de qualité également.
+
+Les bases de données SILVA et UNITE ont permis respectivement l'assignation taxonomique bactérienne et fongique.
+
+Enfin, la construction de l'objet phyloseq a permis la construction de toutes les autres figures.
 
 ## Mise en place de dada2
 
