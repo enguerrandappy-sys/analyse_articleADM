@@ -535,7 +535,7 @@ print(p)
 ```
 ![](Alpha_Diversity_Groups2.png)<!-- -->
 
-### PCoA 
+### Analyse en coordonées principales
 
 ```{r}
 metadata <- as.data.frame(as(sample_data(ps), "data.frame"))
@@ -561,8 +561,9 @@ p_pcoa_fungi <- plot_ordination(ps, pcoa_res, color = "Condition_Aled") +
 
 print(p_pcoa_fungi)
 ```
-![](Alpha_Diversity_Groups2.png)<!-- -->
+![](PCoA_Bacteries_Fungi.png)<!-- -->
 
+La PCoA permet de constater 2 groupes distinct, avec une plus grande diversité chez les échantillons inoculés, ce qui porte sens.
 
 ### Barplot de composition taxonomique 
 ```{r}
@@ -622,7 +623,43 @@ Malgré ces changements, D. hansenii reste dominant dans l’ensemble des traite
 
 Ces résultats indiquent que l’inoculation directe favorise une structuration plus complexe des communautés fongiques sans remise en cause de l’espèce dominante.
 
-A noter que dans le code utilisé, une assignation manuelle jusqu'à l'espèce a été performée vis à vis des Debaryomyces non identifiées, car en majorité repréentées par D. hansenii
+A noter que dans le code utilisé, une assignation manuelle jusqu'à l'espèce a été performée vis à vis des Debaryomyces non identifiées, car en majorité repréentées par D. hansenii.
+
+### Heatmap
+
+```{r}
+# --- Préparation Top 10 ---
+ps_f_genus <- tax_glom(ps, taxrank = "Genus")
+top10_f <- names(sort(taxa_sums(ps_f_genus), decreasing = TRUE)[1:10])
+ps_f_top10 <- prune_taxa(top10_f, ps_f_genus)
+
+# --- Heatmap sans fond noir ---
+p_heat_f <- plot_heatmap(ps_f_top10, 
+                         method = "NMDS", 
+                         distance = "bray", 
+                         taxa.label = "Genus",
+                         low = "#F0F0F0", # Gris très clair (presque blanc) pour le minimum
+                         high = "firebrick", # Rouge pour le maximum
+                         na.value = "white") + # Fond des cases NA
+  theme_bw() + 
+  theme(
+    axis.text.x = element_blank(),
+    axis.ticks.x = element_blank(),
+    axis.text.y = element_text(face = "italic", color = "black"),
+    # LES LIGNES CI-DESSOUS SUPPRIMENT LE NOIR :
+    panel.background = element_rect(fill = "white"),
+    plot.background = element_rect(fill = "white"),
+    panel.grid.major = element_blank(),
+    panel.grid.minor = element_blank(),
+    strip.background = element_rect(fill = "white")
+  ) +
+  labs(title = "Top 10 des Genres Fongiques (Fond Blanc)")
+
+print(p_heat_f)
+```
+![](Alpha_Diversity_Plot.png)<!-- -->
+
+La heatmap permet de mettre en évidence les microrganismes majoritaires, et de pouvoir définir les "profils types".
 
 ## Partie bactérienne 
 
@@ -788,3 +825,42 @@ En contraste avec ces résultats, Staphylococcus sp., S. saprophyticus et L. sak
 
 Globalement, les communautés bactériennes de ces échantillons étaient moins diversifiées que celles des saucisses fermentées naturellement.
 
+### Heatmap
+
+```{r}
+# 1. Nettoyage des échantillons sans reads
+ps_b_clean <- prune_samples(sample_sums(ps_bact) > 0, ps_bact)
+
+# 2. Transformation de Hellinger (indispensable pour éviter l'erreur d'eigenvalues)
+# Cela réduit l'impact des taxons ultra-dominants
+ps_b_hel <- transform_sample_counts(ps_b_clean, function(x) sqrt(x / sum(x)))
+
+# 3. Agglomération et Top 10
+ps_b_genus <- tax_glom(ps_b_hel, taxrank = "Genus")
+ps_named <- subset_taxa(ps_b_genus, Genus != "Unclassified")
+top10_ids <- names(sort(taxa_sums(ps_named), decreasing = TRUE)[1:10])
+ps_top10 <- prune_taxa(top10_ids, ps_named)
+
+# 4. Heatmap avec méthode de clustering hiérarchique (plus stable)
+p_heat_bact <- plot_heatmap(ps_top10, 
+                            method = NULL,      # On désactive l'ordination NMDS/PCoA qui plante
+                            distance = "bray", 
+                            taxa.label = "Genus", 
+                            sample.order = "Condition", 
+                            low = "white", 
+                            high = "darkblue", 
+                            na.value = "white") +
+  theme_bw() +
+  theme(
+    axis.text.x = element_blank(),
+    axis.ticks.x = element_blank(),
+    axis.text.y = element_text(face = "italic", size = 11, color = "black"),
+    panel.background = element_rect(fill = "white"),
+    panel.grid = element_blank()
+  ) +
+  labs(title = "Top 10 des Genres Bactériens",
+       subtitle = "Transformation : Hellinger | Groupé par Condition",
+       fill = "Abondance (Hellinger)")
+
+print(p_heat_bact)
+```
