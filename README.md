@@ -657,7 +657,7 @@ p_heat_f <- plot_heatmap(ps_f_top10,
 
 print(p_heat_f)
 ```
-![](Alpha_Diversity_Plot.png)<!-- -->
+![](Heatmap1 (1).png)<!-- -->
 
 La heatmap permet de mettre en évidence les microrganismes majoritaires, et de pouvoir définir les "profils types".
 
@@ -864,3 +864,6 @@ p_heat_bact <- plot_heatmap(ps_top10,
 
 print(p_heat_bact)
 ```
+![](Heatmap_Bacteries_Top10.png)<!-- -->
+
+La heatmap permet comme précédemment de dresser des profils types via abondance.
