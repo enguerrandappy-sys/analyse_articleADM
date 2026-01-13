@@ -535,6 +535,34 @@ print(p)
 ```
 ![](Alpha_Diversity_Groups2.png)<!-- -->
 
+### PCoA 
+
+```{r}
+metadata <- as.data.frame(as(sample_data(ps), "data.frame"))
+n_total <- nrow(metadata)
+conditions <- rep("no inoculation", n_total)
+conditions[1:min(40, n_total)] <- "direct"
+
+metadata$Condition_Aled <- factor(conditions, levels = c("direct", "no inoculation"))
+sample_data(ps) <- sample_data(metadata)
+
+pcoa_res <- ordinate(ps, method = "PCoA", distance = "bray")
+
+p_pcoa_fungi <- plot_ordination(ps, pcoa_res, color = "Condition_Aled") + 
+  geom_point(size = 3, alpha = 0.7) + 
+  stat_ellipse(type = "t", linetype = 2) + 
+  theme_bw() +
+  scale_color_manual(values = c("direct" = "blue", "no inoculation" = "red")) +
+  labs(title = "PCoA : Communautés Fongiques (UNITE)",
+       subtitle = paste("Distance : Bray-Curtis | n =", n_total),
+       color = "Condition") +
+  theme(plot.title = element_text(face = "bold"),
+        aspect.ratio = 1) # Pour un graphique carré plus lisible
+
+print(p_pcoa_fungi)
+```
+![](Alpha_Diversity_Groups2.png)<!-- -->
+
 
 ### Barplot de composition taxonomique 
 ```{r}
@@ -678,8 +706,9 @@ p_final <- plot_ordination(ps_bact, pcoa_res, color = "Condition_Aled") +
 print(p_final)
 ```
 
-![](Alpha_Diversity_Plot.png)<!-- -->
+![](PCoA_Microbiome_79ech.png)<!-- -->
 
+La PCoA montre une séparation plutôt nette entre les échantillons inoculés et ceux ne l'étant pas, avec une grande diversité pour les échantillons "Directs", et une tendance à se regrouper pour les échantillons non inoculés.
 ### Barplot de composition taxonomique 
 
 ```{r}
