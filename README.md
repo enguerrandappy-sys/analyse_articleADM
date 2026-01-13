@@ -535,6 +535,8 @@ print(p)
 ```
 ![](Alpha_Diversity_Groups2.png)<!-- -->
 
+Une plus faible diversité est constatée chez les échantillons non inoculés 
+
 ### Analyse en coordonées principales
 
 ```{r}
@@ -657,7 +659,7 @@ p_heat_f <- plot_heatmap(ps_f_top10,
 
 print(p_heat_f)
 ```
-![](Heatmap1 (1).png)<!-- -->
+![](Heatmap1.png)<!-- -->
 
 La heatmap permet de mettre en évidence les microrganismes majoritaires, et de pouvoir définir les "profils types".
 
@@ -713,7 +715,9 @@ print(p)
 ```
 ![](Alpha_Diversity_Plot.png)<!-- -->
 
-### PCoA
+Comme pour les fungi, la diversité est plus faible pour les échantillons non inoculés.
+
+### Analyse en coordonnées principales 
 
 ```{r}
 metadata <- as.data.frame(as(sample_data(ps_bact), "data.frame"))
@@ -867,3 +871,21 @@ print(p_heat_bact)
 ![](Heatmap_Bacteries_Top10.png)<!-- -->
 
 La heatmap permet comme précédemment de dresser des profils types via abondance.
+
+## Discussion 
+
+Les analyses statistiques effectuées concordent avec celle de l'article, cependant quelques changements sont observables, tels que l'absence d'identification claire de D. hansenii, pourtant très présente. Cela peut sûrement être expliqué par dex complications au niveau des base de données utilisées : les versions ne sont pas les mêmes, et la database GreenGenes a été utilisée dans l'article tandis que la database Silva est utilisée dans ce script. 
+
+La comparaison entre Direct et non inoculé présente de certaines différences, notamment dans la présence ou absence de certains microorganismes, ainsi que dans la diverszité générale. De plus, les analyses effectuées n'ayant pas toutes été réalisées dans l'étude, celles-ci restent limitées par les données. Il en va de même pour les analyses mycotoxines de l'article, n'ayant pas pu être réalisées ici. 
+
+Il en va de même pour toutes les figures, où des erreurs ont pu être réalisées. 
+
+La prévalence de Debaryomyces et Staphylococcus est tout à fait normale, la première étant halotolérante et la seconde aidant pour la couleur, tandis que les deux servent à développer les arômes.
+
+## Conclusion 
+
+En conclusion, l'étude du microbiome démontre que le mode d'inoculation est le principal moteur de la structure taxonomique du saucisson. 
+
+Les deux méthodes (fermentation spontanée ou inoculation directe) permettent cependant tout de même d'éviter la présence de pathogènes, non retrouvés dans les échantillons. 
+
+Il reste tout de même préférable d'effectuer une inoculation directe pour permettre un meilleur contrôle sur la production.
