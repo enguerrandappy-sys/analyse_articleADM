@@ -39,7 +39,7 @@ Les bases de données SILVA et UNITE ont permis respectivement l'assignation tax
 
 Enfin, la construction de l'objet phyloseq a permis la construction de toutes les autres figures.
 
-## Mise en place de dada2
+## Mise en place de dada2 (A--R Enguerrand)
 
 ```{r, echo=FALSE}
 library(dada2)
@@ -432,7 +432,7 @@ SRR15634655  70934    45311     45209     45278  45106   44802
 SRR15634656  87940    44730     44579     44618  43046   40178
 ```
 
-## Partie fongique 
+## Partie fongique (A--R Enguerrand)
 
 ### Assignation taxonomique 
 
@@ -677,7 +677,7 @@ print(p_heat_f)
 
 La heatmap permet de mettre en évidence les microrganismes majoritaires, et de pouvoir définir les "profils types".
 
-## Partie bactérienne 
+## Partie bactérienne (B. Antoine) 
 
 ### Assignation taxonomique 
 
